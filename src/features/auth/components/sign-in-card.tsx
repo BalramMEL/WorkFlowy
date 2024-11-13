@@ -1,3 +1,5 @@
+'use client'
+
 import { DottedSeparator } from '@/components/dotted-separator'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -20,7 +22,7 @@ import { loginSchema } from '../Schemas'
 import { useLogin } from '../api/use-login'
 
 export const SignInCard = () => {
-    const { mutate } = useLogin();
+    const { mutate, isPending } = useLogin();
 
     const form = useForm < z.infer < typeof loginSchema>>({
         resolver: zodResolver(loginSchema),
@@ -79,7 +81,7 @@ export const SignInCard = () => {
                               </FormItem>
                           )}
                       />
-                    <Button disabled={false} size="lg" className='w-full'>
+                    <Button disabled={isPending} size="lg" className='w-full'>
                         Login
                     </Button>
                 </form>
@@ -92,7 +94,7 @@ export const SignInCard = () => {
               <Button
                   className='w-full'
                   variant="secondary"
-                  disabled={false}
+                  disabled={isPending}
                   size={"lg"}
               >
                   <FcGoogle className='mr-2 size-5'/>
@@ -101,7 +103,7 @@ export const SignInCard = () => {
               <Button
                   className='w-full'
                   variant="secondary"
-                  disabled={false}
+                  disabled={isPending}
                   size={"lg"}
               >
                   <FaGithub className='mr-2 size-5'/>
