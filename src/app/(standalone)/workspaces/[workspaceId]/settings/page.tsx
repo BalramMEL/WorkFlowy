@@ -1,5 +1,5 @@
-import { getCurrent } from '@/features/auth/actions';
-import { getWorksapce } from '@/features/workspaces/actions';
+import { getCurrent } from '@/features/auth/queries';
+import { getWorksapce } from '@/features/workspaces/queries';
 import { EditWorkspaceForm } from '@/features/workspaces/components/edit-workspace-form';
 import { redirect } from 'next/navigation';
 import React from 'react'

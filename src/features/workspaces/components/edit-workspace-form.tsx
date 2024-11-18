@@ -124,7 +124,7 @@ export const EditWorkspaceForm = ({ onCancel, initialValues }: EditWorkspaceForm
                                                 </Avatar>
                                             )}
                                             <div>
-                                                <p className="text-base">
+                                                <p className="text-sm font-medium">
                                                     Workspace Icon
                                                 </p>
                                                 <p className="text-sm text-muted-foreground">

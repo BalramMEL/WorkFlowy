@@ -113,10 +113,10 @@ export const CreateWorkspaceForm = ({ onCancel }: CreateWorkspaceFormProps) => {
                                                 </Avatar>
                                             )}
                                             <div>
-                                                <p className="">
+                                                <p className="text-sm font-medium">
                                                     Workspace Icon
                                                 </p>
-                                                <p className="">
+                                                <p className="text-sm text-muted-foreground">
                                                     JPG, PNG, SVG or JPEG, max 1 mb
                                                 </p>
                                                 <input
