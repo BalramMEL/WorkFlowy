@@ -2,6 +2,8 @@ import { cookies } from "next/headers"
 import { Account, Client, Databases, Query } from "node-appwrite"
 import { AUTH_COOKIE } from "../auth/constants";
 import { DATABASES_ID, MEMBERS_ID, WORKSPACES_ID } from "@/config";
+import { getMember } from "../members/utils";
+import { Workspace } from "./types";
 
 export const getWorksapces = async () => {
     try {
@@ -44,5 +46,47 @@ export const getWorksapces = async () => {
         return workspaces
     } catch {
         return {documents: [], total: 0}
+    }
+}
+
+interface GetWorkSpaceProps{
+    workspaceId: string;
+}
+
+
+export const getWorksapce = async ({workspaceId}: GetWorkSpaceProps) => {
+    try {
+        const client = new Client()
+            .setEndpoint(process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT!)
+            .setProject(process.env.NEXT_PUBLIC_APPWRITE_PROJECT!)
+        
+        const session = cookies().get(AUTH_COOKIE);
+        
+        if (!session) return null;
+
+        client.setSession(session.value);
+        const databases = new Databases(client);
+        const account = new Account(client);
+        const user = await account.get();
+
+        const member = await getMember({
+            databases,
+            userId: user.$id,
+            workspaceId
+        })
+
+        const workspaces = await databases.getDocument<Workspace>(
+            DATABASES_ID,
+            WORKSPACES_ID,
+            workspaceId,
+        );
+
+        if (!member) {
+            return null;
+        }
+
+        return workspaces;
+    } catch {
+        return null
     }
 }

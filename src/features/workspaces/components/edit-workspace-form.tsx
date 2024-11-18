@@ -1,7 +1,6 @@
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { createWorkspaceSchema } from "../schemas";
 import { FormProvider, useForm } from "react-hook-form";
 import { z } from "zod";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -14,34 +13,42 @@ import React, { useRef } from "react";
 import { Avatar } from "@/components/ui/avatar";
 import Image from "next/image";
 import { AvatarFallback } from "@radix-ui/react-avatar";
-import { ImageIcon } from "lucide-react";
+import { ArrowLeftIcon, ImageIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
+import { Workspace } from "../types";
+import { updateWorkspaceSchema } from "../schemas";
+import { useUpdateWorkspace } from "../api/use-update-worksapce";
 
-interface CreateWorkspaceFormProps {
+interface EditWorkspaceFormProps {
     onCancel?: () => void;
+    initialValues: Workspace;
 }
 
-export const CreateWorkspaceForm = ({ onCancel }: CreateWorkspaceFormProps) => { 
-    const { mutate, isPending } = useCreateWorkspace();
+export const EditWorkspaceForm = ({ onCancel, initialValues }: EditWorkspaceFormProps) => { 
+    const { mutate, isPending } = useUpdateWorkspace();
     const router = useRouter();
 
     const inputRef = useRef<HTMLInputElement>(null);
 
-    const form = useForm<z.infer<typeof createWorkspaceSchema>>({
-        resolver: zodResolver(createWorkspaceSchema),
+    const form = useForm<z.infer<typeof updateWorkspaceSchema>>({
+        resolver: zodResolver(updateWorkspaceSchema),
         defaultValues: {
-            name: "",
+            ...initialValues,
+            image: initialValues.imageUrl ?? ""
         },
     })
 
-    const onSubmit = (values: z.infer<typeof createWorkspaceSchema>) => {
+    const onSubmit = (values: z.infer<typeof updateWorkspaceSchema>) => {
         const finalValues = {
             ...values,
             image: values.image instanceof File ? values.image : "",
         };
         
-        mutate({ form: finalValues }, {
+        mutate({
+            form: finalValues,
+            param: {workspaceId: initialValues.$id}
+         }, {
             onSuccess: ({data}) => {
                 form.reset();
                 router.push(`/workspaces/${data.$id}`);    
@@ -58,9 +65,13 @@ export const CreateWorkspaceForm = ({ onCancel }: CreateWorkspaceFormProps) => {
 
     return (
         <Card className="w-full h-full border-none shadow-none">
-            <CardHeader className="flex p-7">
+            <CardHeader className="flex flex-row items-center gap-x-4 p-7 space-y-0">
+                <Button size={"sm"} variant={"secondary"} onClick={onCancel ? onCancel : () => router.push(`/workspaces/${initialValues.$id}`)}>
+                    <ArrowLeftIcon className="mr-2 size-4"/>
+                    Back
+                </Button>
                 <CardTitle className="text-xl font-bold">
-                    Create a new workspace
+                    {initialValues.name}
                 </CardTitle>
             </CardHeader>
             <div className="px-7">
@@ -113,10 +124,10 @@ export const CreateWorkspaceForm = ({ onCancel }: CreateWorkspaceFormProps) => {
                                                 </Avatar>
                                             )}
                                             <div>
-                                                <p className="">
+                                                <p className="text-base">
                                                     Workspace Icon
                                                 </p>
-                                                <p className="">
+                                                <p className="text-sm text-muted-foreground">
                                                     JPG, PNG, SVG or JPEG, max 1 mb
                                                 </p>
                                                 <input
@@ -127,7 +138,7 @@ export const CreateWorkspaceForm = ({ onCancel }: CreateWorkspaceFormProps) => {
                                                     accept=".jpg, .jpeg, .png, .svg"
                                                     onChange={handleImageChange}
                                                 />
-                                                {
+                                            {
                                                     field.value ? (
                                                         <Button
                                                             className="w-fit mt-2"
@@ -180,7 +191,7 @@ export const CreateWorkspaceForm = ({ onCancel }: CreateWorkspaceFormProps) => {
                                 size="lg"
                                 disabled={isPending}
                             >
-                                Create Workspace
+                                Save Changes
                             </Button>
                         </div>
                     </form>
